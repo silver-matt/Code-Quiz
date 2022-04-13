@@ -6,12 +6,12 @@ var choicesDiv = document.querySelector("#choices");
 var wrapper = document.querySelector("#wrapper");
 
 var pauseTime = 0;
-var timeRemaining = document.getElementById("timeLeft");
+var timeRemaining = document.querySelector("#timeLeft");
 var secondsLeft = 76;
 var holdInterval = 0;
 var penalty = 10;
 var ulCreate = document.createElement("ul");
-var questionsContainer = document.querySelector("#content");
+var questionsContainer = document.querySelector("#questionsContainer");
 
 var questions = [
   {
@@ -38,7 +38,7 @@ var questions = [
   },
   {
     title: "What is the approximate speed of sound?",
-    choices: ["A. 120 km/h", "B. 1,200 km/h", "C. 400 km/h", "C. 700 km/h"],
+    choices: ["A. 120 km/h", "B. 1,200 km/h", "C. 400 km/h", "D. 700 km/h"],
     // Put exactly the answer to the choices
     answers: "B. 1,200 km/h",
   },
@@ -74,9 +74,9 @@ var questions = [
   },
 ];
 
-timer.addEventListener("click", function() {
-  if (holdInterval === 0) {
-    holdInterval = setInterval(function() {
+timer.addEventListener("click", function () {
+  if (pauseTime === 0) {
+    pauseTime = setInterval(function () {
       secondsLeft--;
       timeRemaining.textContent = "time: " + secondsLeft;
       if (secondsLeft <= 0) {
@@ -89,7 +89,7 @@ timer.addEventListener("click", function() {
   }
 });
 
-function display(questionIndex) {
+function display() {
   questionsContainer.innerHTML = "";
   ulCreate.innerHTML = "";
   for (var i = 0; i < questions.length; i++) {
@@ -97,7 +97,7 @@ function display(questionIndex) {
     var userAnswers = questions[questionIndex].choices;
     questionsContainer.textContent = userQuestions;
   }
-  userAnswers.forEach(function(nextQuestion) {
+  userAnswers.forEach(function (nextQuestion) {
     let listItem = document.createElement("li");
     listItem.textContent = nextQuestion;
     questionsContainer.appendChild(ulCreate);
@@ -116,7 +116,7 @@ function compare(event) {
       createDiv.textContent = "Correct! " + questions[questionIndex].answers;
     } else {
       secondsLeft = secondsLeft - penalty;
-      createDiv.textContent = "Wrong " + questions[index].answers;
+      createDiv.textContent = "Wrong " + questions[questionIndex].answers;
     }
   }
   questionIndex++;
@@ -157,38 +157,36 @@ function finished() {
   const saveInfo = document.createElement("button");
   saveInfo.type = "submit";
   saveInfo.id = "submit";
-//   test displayed on button
+  //   text displayed on button
   saveInfo.textContent = "Submit";
   questionsContainer.appendChild(saveInfo);
-// Save to local storage
-saveInfo.addEventListener("click", function(){
+  // Save to local storage
+  saveInfo.addEventListener("click", function () {
     var initials = userInitials.value;
-    if (initials === ""){
-        console.log("No Value Entered");
-        const noInitials = document.createElement("h1");
-        noInitials.id = "noInitials";
-        noInitials.textContent = "Please enter initials";
-        questionsContainer.appendChild(noInitials);
-        } else {
-            var finalScore = {
-                initials: initials,
-                 score: timeLeft * 2
-            }
-            console.log(finalScore);
-            var allScores = localStorage.getItem("allScores");
-            if (allScores === null){
-                allScores = [];
-
-            } else {
-                allScores = JSON.parse(allScores);
-
-            }
-            allScores.push(finalScore);
-            var newScore = JSON.stringify(allScores);
-            localStorage.setItem("allScores", newScore);
-            window.location.replace("scores.html");
-        }
-});
-
+    if (initials === "") {
+      console.log("No Value Entered");
+      const noInitials = document.createElement("h1");
+      noInitials.id = "noInitials";
+      noInitials.textContent = "Please enter initials";
+      questionsContainer.appendChild(noInitials);
+    } else {
+      var finalScore = {
+        initials: initials,
+        score: + timeLeft * 2,
+      };
+      console.log(finalScore);
+      var allScores = localStorage.getItem("allScores");
+      if (allScores === null) {
+        allScores = [];
+      } else if (allScores === 0) {
+        allScores = 0;
+      } else {
+        allScores = JSON.parse(allScores);
+      }
+      allScores.push(finalScore);
+      var newScore = JSON.stringify(allScores);
+      localStorage.setItem("allScores", newScore);
+      window.location.replace("scores.html");
+    }
+  });
 }
-
